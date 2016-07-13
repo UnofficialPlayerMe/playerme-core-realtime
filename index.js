@@ -2,9 +2,8 @@ var SailsIoClient = require('sails.io.js');
 var SocketIo = require('socket.io-client');
 
 console.log('#################################################################');
-console.log('# Setup');
-console.log('#################################################################');
-console.log('');
+
+// <editor-fold desc="Setup">
 
 /**
  * @var {{
@@ -22,14 +21,9 @@ var io = new SailsIoClient(SocketIo);
 io.sails.autoConnect = false;
 
 /**
- * Socket
- * @var {{
- *     io: Manager,
- *     connected: boolean,
- *     disconnected: boolean,
- * }}
+ * @var SailsSocket
  */
-var socket = io.connect('https://player.me:443', {
+var socket = io.sails.connect('https://player.me:443', {
     transports: ['websocket'],
     agent: false
 
@@ -46,7 +40,10 @@ var socket = io.connect('https://player.me:443', {
     // extraHeaders: undefined
 });
 
-// <editor-fold desc="Events">
+// </editor-fold>
+// <editor-fold desc="Event bindings">
+
+// Native
 socket.on('connect', onConnect);
 socket.on('error', onError);
 socket.on('disconnect', onDisconnect);
@@ -55,14 +52,11 @@ socket.on('reconnect_attempt', onReconnectAttempt);
 socket.on('reconnecting', onReconnecting);
 socket.on('reconnect_error', onReconnectError);
 socket.on('reconnect_failed', onReconnectFailed);
+
+// Custom
+socket.on('test', onTest);
+
 // </editor-fold>
-
-console.log('');
-console.log('#################################################################');
-console.log('# Responses');
-console.log('#################################################################');
-console.log('');
-
 // <editor-fold desc="Event methods">
 
 /**
@@ -70,6 +64,8 @@ console.log('');
  */
 function onConnect(){
     console.log('onConnect');
+    console.log("sendTest >> ping");
+    sendTest("<< pong");
 }
 
 /**
@@ -126,6 +122,25 @@ function onReconnectError(error){
  */
 function onReconnectFailed(){
     console.error('onReconnectFailed');
+}
+
+/**
+ * Fired when a test ping responds
+ * @param {object} payload Payload containing the 'message' originally sent out
+ */
+function onTest(payload){
+    console.log("onTest", payload.message);
+}
+
+// </editor-fold>
+// <editor-fold desc="Request methods">
+
+/**
+ * Send a message to be picked up by onTest()
+ * @param {string} message Message to be sent back.
+ */
+function sendTest(message){
+    socket.post('/test', { message: message });
 }
 
 // </editor-fold>
