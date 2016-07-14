@@ -7,6 +7,7 @@
     <script type="text/javascript" src="bower_components/sails.io.js/dist/sails.io.js"></script>
     <script type="text/javascript">
         io.sails.autoConnect = false;
+        io.sails.rejectUnauthorized = false;
 
         var socket = io.sails.connect('https://player.me:443', {
             transports: ['websocket']
@@ -29,6 +30,7 @@
             });
         };
 
+        // Sails
         logOnEvent('connect');
         errOnEvent('error');
         logOnEvent('disconnect');
@@ -38,12 +40,26 @@
         errOnEvent('reconnect_error');
         errOnEvent('reconnect_failed');
 
+        // Player
         logOnEvent('test');
         logOnEvent('feed');
         logOnEvent('feed-new');
         logOnEvent('friend:online');
         logOnEvent('notifications:new');
         logOnEvent('notifications:mark_all_read');
+
+        // ???
+        logOnEvent("close");
+        logOnEvent("heartbeat");
+        logOnEvent("success");
+        logOnEvent("data");
+        logOnEvent("sails:parseError");
+        logOnEvent("pjax:start");
+        logOnEvent("pjax:complete");
+        logOnEvent("click.pjax");
+        logOnEvent("popstate.pjax");
+        logOnEvent("layout");
+        logOnEvent("layoutComplete");
 
 
         sendVerify(false, function(body, JWR){
@@ -53,7 +69,7 @@
                 headers: JWR.headers
             });
 
-            subscribeFeed();
+            subscribeFeedNew();
             sendTest('ping');
         });
 
@@ -71,12 +87,22 @@
             socket.post('/verify', params, callback);
         }
 
-        function subscribeFeed(key){
-            if (!key) key = 'general';
-            var params = { channel:'feed', key:key };
+        function subscribeFeed(activityIds){
+            if (!activityIds) activityIds = ['following', 'discover'];
+            var params = { channel:'feed', key:activityIds };
             console.log('subscribe-feed', '>>', params);
+
             socket.post('/rooms', params, function(){
-                console.log("ubscribe-feed <<", arguments);
+                console.log("subscribe-feed <<", arguments);
+            });
+        }
+        function subscribeFeedNew(tabs){
+            if (!tabs) tabs = ['following', 'discover'];
+            var params = { channel:'feed-new', key:tabs };
+            console.log('subscribe-feed', '>>', params);
+
+            socket.post('/rooms', params, function(){
+                console.log("subscribe-feed <<", arguments);
             });
         }
     </script>
