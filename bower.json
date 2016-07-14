@@ -1,0 +1,17 @@
+{
+  "name": "playerme-core-realtime",
+  "description": "",
+  "homepage": "https://github.com/UnofficialPlayerMe/playerme-core-realtime",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "sails.io.js": "^0.13.8"
+  }
+}

@@ -55,6 +55,7 @@ socket.on('reconnect_failed', onReconnectFailed);
 
 // Custom
 socket.on('test', onTest);
+socket.on('feed', onFeed);
 
 // </editor-fold>
 // <editor-fold desc="Event methods">
@@ -64,8 +65,15 @@ socket.on('test', onTest);
  */
 function onConnect(){
     console.log('onConnect');
+
     console.log("sendTest >> ping");
-    sendTest("<< pong");
+    sendTest("<< ping");
+
+    console.log("Subscribe to feed...");
+    subscribeFeed();
+
+    // console.log("Verify >>");
+    // sendVerify(function(){ console.log("Verify <<", arguments); });
 }
 
 /**
@@ -132,6 +140,10 @@ function onTest(payload){
     console.log("onTest", payload.message);
 }
 
+function onFeed(payload){
+    console.log("onFeed", payload);
+}
+
 // </editor-fold>
 // <editor-fold desc="Request methods">
 
@@ -141,6 +153,27 @@ function onTest(payload){
  */
 function sendTest(message){
     socket.post('/test', { message: message });
+}
+
+/**
+ * This will link the Socket ID to the User ID,
+ * so that the Sails can send user-wide messages to the correct sockets.
+ * Send this immediately after connect.
+ * @param {string} oauthAccessToken
+ * @param {function} callback
+ */
+function sendVerify(oauthAccessToken, callback){
+    var params = null;
+    if (oauthAccessToken) params = { access_token: oauthAccessToken };
+    socket.post('/verify', params, callback);
+}
+
+function subscribeFeed(key){
+    if (!key) key = 'general';
+    console.log("subscribeFeed >>",key);
+    socket.post('/rooms', { channel:'feed', key:key }, function(){
+        console.log("subscribeFeed <<", arguments);
+    });
 }
 
 // </editor-fold>
