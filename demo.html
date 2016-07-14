@@ -13,20 +13,30 @@
             transports: ['websocket']
         });
 
+        var logRequest = function(name, params){
+            console.log(name, '>>', params);
+        };
+        var logResponse = function(name, args){
+            args = Array.prototype.slice.call(args);
+            args = [name, '<<'].concat(args.length ? args : [undefined]);
+            console.log.apply(console, args);
+        };
+        var errorResponse = function(name, args){
+            args = Array.prototype.slice.call(args);
+            args = [name, '<<'].concat(args.length ? args : [undefined]);
+            console.log.apply(console, args);
+        };
+
         var logOnEvent = function(eventIdentity){
             console.log(eventIdentity, '...');
             socket.on(eventIdentity, function(){
-                var args = Array.prototype.slice.call(arguments);
-                args = [eventIdentity, '<<'].concat(args.length ? args : [undefined]);
-                console.log.apply(console, args);
+                logResponse(eventIdentity, arguments);
             });
         };
         var errOnEvent = function(eventIdentity){
             console.log(eventIdentity, '...');
             socket.on(eventIdentity, function(){
-                var args = Array.prototype.slice.call(arguments);
-                args = [eventIdentity, '<<'].concat(args.length ? args : [undefined]);
-                console.error.apply(console, args);
+                errorResponse(eventIdentity, arguments);
             });
         };
 
@@ -63,48 +73,44 @@
 
 
         sendVerify(false, function(body, JWR){
-            console.log('verify', '<<', {
-                body: body,
-                statusCode: JWR.statusCode,
-                headers: JWR.headers
-            });
+            logResponse('verify', arguments);
 
             subscribeFeedNew();
             sendTest('ping');
+
+            socket.on('feed-new', function(payload){
+                subscribeFeed(payload.activity.id);
+            });
         });
 
 
         function sendTest(message){
             var params = { message: message };
-            console.log('test', '>>', params);
+            logRequest('test', params);
             socket.post('/test', params);
         }
 
         function sendVerify(oauthAccessToken, callback){
             var params = null;
             if (oauthAccessToken) params = { access_token: oauthAccessToken };
-            console.log('verify', '>>', params);
+            logRequest('verify', params);
             socket.post('/verify', params, callback);
         }
 
-        function subscribeFeed(activityIds){
+        function subscribeFeed(activityIds, callback){
             if (!activityIds) activityIds = ['following', 'discover'];
             var params = { channel:'feed', key:activityIds };
-            console.log('subscribe-feed', '>>', params);
-
-            socket.post('/rooms', params, function(){
-                console.log("subscribe-feed <<", arguments);
-            });
+            logRequest('feed', params);
+            socket.post('/rooms', params, callback);
         }
-        function subscribeFeedNew(tabs){
+
+        function subscribeFeedNew(tabs, callback){
             if (!tabs) tabs = ['following', 'discover'];
             var params = { channel:'feed-new', key:tabs };
-            console.log('subscribe-feed', '>>', params);
-
-            socket.post('/rooms', params, function(){
-                console.log("subscribe-feed <<", arguments);
-            });
+            logRequest('feed-new', params);
+            socket.post('/rooms', params, callback);
         }
+
     </script>
 
 </head>
