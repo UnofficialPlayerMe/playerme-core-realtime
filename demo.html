@@ -8,21 +8,24 @@
     <script type="text/javascript">
         io.sails.autoConnect = false;
 
-        console.log('io');
-        console.log(io);
-
         var socket = io.sails.connect('https://player.me:443', {
             transports: ['websocket']
         });
 
         var logOnEvent = function(eventIdentity){
+            console.log(eventIdentity, '...');
             socket.on(eventIdentity, function(){
-                console.log(eventIdentity, arguments);
+                var args = Array.prototype.slice.call(arguments);
+                args = [eventIdentity, '<<'].concat(args.length ? args : [undefined]);
+                console.log.apply(console, args);
             });
         };
         var errOnEvent = function(eventIdentity){
+            console.log(eventIdentity, '...');
             socket.on(eventIdentity, function(){
-                console.error(eventIdentity, arguments);
+                var args = Array.prototype.slice.call(arguments);
+                args = [eventIdentity, '<<'].concat(args.length ? args : [undefined]);
+                console.error.apply(console, args);
             });
         };
 
@@ -44,32 +47,36 @@
 
 
         sendVerify(false, function(body, JWR){
-            console.log('verify', {
+            console.log('verify', '<<', {
                 body: body,
                 statusCode: JWR.statusCode,
                 headers: JWR.headers
             });
 
-            sendTest('ping');
             subscribeFeed();
+            sendTest('ping');
         });
 
 
         function sendTest(message){
-            socket.post('/test', { message: message });
+            var params = { message: message };
+            console.log('test', '>>', params);
+            socket.post('/test', params);
         }
 
         function sendVerify(oauthAccessToken, callback){
             var params = null;
             if (oauthAccessToken) params = { access_token: oauthAccessToken };
+            console.log('verify', '>>', params);
             socket.post('/verify', params, callback);
         }
 
         function subscribeFeed(key){
             if (!key) key = 'general';
-            console.log("subscribeFeed >>",key);
-            socket.post('/rooms', { channel:'feed', key:key }, function(){
-                console.log("subscribeFeed <<", arguments);
+            var params = { channel:'feed', key:key };
+            console.log('subscribe-feed', '>>', params);
+            socket.post('/rooms', params, function(){
+                console.log("ubscribe-feed <<", arguments);
             });
         }
     </script>
