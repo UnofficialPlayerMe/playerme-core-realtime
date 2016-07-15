@@ -7,7 +7,7 @@ var make = function(filename, target, externals, alias){
     return {
         output: {
             filename: filename,
-            library: ['PlayerMe', 'Realtime']
+            library: ['PlayerMe', 'realtime']
         },
         module: {
             loaders: [
