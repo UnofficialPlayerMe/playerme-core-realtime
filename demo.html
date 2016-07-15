@@ -2,117 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>PlayerME Realtime Demo</title>
 
-    <script type="text/javascript" src="bower_components/sails.io.js/dist/sails.io.js"></script>
+    <script type="text/javascript" src="dist/playerme.realtime.js"></script>
     <script type="text/javascript">
-        io.sails.autoConnect = false;
-        io.sails.rejectUnauthorized = false;
+        console.log("PlayerMe", PlayerMe);
+        var RealtimeService = PlayerMe.Realtime.RealtimeService;
 
-        var socket = io.sails.connect('https://player.me:443', {
-            transports: ['websocket']
+        var service = new RealtimeService();
+        service.connect('https://player.me:443');
+
+        console.log(">> verify");
+        service.verify(function(body, JWR){
+            console.log("<< verify", {
+                body: body,
+                JWR: JWR,
+                arguments: arguments
+            });
+
+            console.log(">> subscribeToFeed");
+            service.subscribeToFeed();
+
+            var testText = "woo";
+            console.log(">> sendTest", testText);
+            service.sendTest(testText);
         });
 
-        var logRequest = function(name, params){
-            console.log(name, '>>', params);
-        };
-        var logResponse = function(name, args){
-            args = Array.prototype.slice.call(args);
-            args = [name, '<<'].concat(args.length ? args : [undefined]);
-            console.log.apply(console, args);
-        };
-        var errorResponse = function(name, args){
-            args = Array.prototype.slice.call(args);
-            args = [name, '<<'].concat(args.length ? args : [undefined]);
-            console.log.apply(console, args);
-        };
-
-        var logOnEvent = function(eventIdentity){
-            console.log(eventIdentity, '...');
-            socket.on(eventIdentity, function(){
-                logResponse(eventIdentity, arguments);
-            });
-        };
-        var errOnEvent = function(eventIdentity){
-            console.log(eventIdentity, '...');
-            socket.on(eventIdentity, function(){
-                errorResponse(eventIdentity, arguments);
-            });
-        };
-
-        // Sails
-        logOnEvent('connect');
-        errOnEvent('error');
-        logOnEvent('disconnect');
-        logOnEvent('reconnect');
-        logOnEvent('reconnect_attempt');
-        logOnEvent('reconnecting');
-        errOnEvent('reconnect_error');
-        errOnEvent('reconnect_failed');
-
-        // Player
-        logOnEvent('test');
-        logOnEvent('feed');
-        logOnEvent('feed-new');
-        logOnEvent('friend:online');
-        logOnEvent('notifications:new');
-        logOnEvent('notifications:mark_all_read');
-
-        // ???
-        logOnEvent("close");
-        logOnEvent("heartbeat");
-        logOnEvent("success");
-        logOnEvent("data");
-        logOnEvent("sails:parseError");
-        logOnEvent("pjax:start");
-        logOnEvent("pjax:complete");
-        logOnEvent("click.pjax");
-        logOnEvent("popstate.pjax");
-        logOnEvent("layout");
-        logOnEvent("layoutComplete");
-
-
-        sendVerify(false, function(body, JWR){
-            logResponse('verify', arguments);
-
-            subscribeFeedNew();
-            sendTest('ping');
-
-            socket.on('feed-new', function(payload){
-                subscribeFeed(payload.activity.id);
-            });
+        service.onTest(function(payload){
+            console.log('<< onTest', payload);
+        });
+        service.onFeedUpdate(function(payload){
+            console.log('<< onFeedUpdate', payload);
+            console.log('>> subscribeToActivity', payload.activity.id);
+            service.subscribeToActivity(payload.activity.id);
         });
 
-
-        function sendTest(message){
-            var params = { message: message };
-            logRequest('test', params);
-            socket.post('/test', params);
-        }
-
-        function sendVerify(oauthAccessToken, callback){
-            var params = null;
-            if (oauthAccessToken) params = { access_token: oauthAccessToken };
-            logRequest('verify', params);
-            socket.post('/verify', params, callback);
-        }
-
-        function subscribeFeed(activityIds, callback){
-            if (!activityIds) activityIds = ['following', 'discover'];
-            var params = { channel:'feed', key:activityIds };
-            logRequest('feed', params);
-            socket.post('/rooms', params, callback);
-        }
-
-        function subscribeFeedNew(tabs, callback){
-            if (!tabs) tabs = ['following', 'discover'];
-            var params = { channel:'feed-new', key:tabs };
-            logRequest('feed-new', params);
-            socket.post('/rooms', params, callback);
-        }
+        service.onActivityUpdate(function(payload){
+            console.log('<< onActivityUpdate', payload);
+        });
 
     </script>
-
 </head>
 <body>
 

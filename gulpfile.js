@@ -1,6 +1,8 @@
 var gulp          = require('gulp');
 var path          = require('path');
 var nodemon       = require('gulp-nodemon');
+var webpackStream = require('webpack-stream');
+var minify        = require('gulp-minify');
 
 var Env = {};
 try{
@@ -8,7 +10,22 @@ try{
 }catch(e){}
 
 
-gulp.task('default', ['run:node']);
+gulp.task('default', ['build:web:source']);
+
+gulp.task('build:web:source', function() {
+    var makeWeb = require('./gulp/webpack').makeWeb;
+    return gulp.src(
+        'src/entry.js'
+    ).pipe(
+        webpackStream(
+            makeWeb('playerme.realtime.js')
+        )
+    ).pipe(
+        minify()
+    ).pipe(
+        gulp.dest('dist/')
+    );
+});
 
 gulp.task('run:node', function() {
 
