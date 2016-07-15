@@ -10,7 +10,7 @@ try{
 }catch(e){}
 
 
-gulp.task('default', ['build:web:source']);
+gulp.task('default', ['build:web:source', 'build:web:vendor']);
 
 gulp.task('build:web:source', function() {
     var makeWeb = require('./gulp/webpack').makeWeb;
@@ -24,6 +24,13 @@ gulp.task('build:web:source', function() {
         minify()
     ).pipe(
         gulp.dest('dist/')
+    );
+});
+gulp.task('build:web:vendor', function(){
+    return gulp.src(
+        'node_modules/playerme-core-models/dist/**.js'
+    ).pipe(
+        gulp.dest('dist')
     );
 });
 

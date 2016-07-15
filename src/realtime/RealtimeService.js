@@ -1,4 +1,21 @@
 import Sails from './Sails';
+import {
+    UserModel,
+    UserExtendedModel,
+    CommentModel,
+    ActivityModel,
+    GameModel,
+    GameExtendedModel
+} from 'player-core-models';
+
+console.log("Realtime Models", [
+    UserModel,
+    UserExtendedModel,
+    CommentModel,
+    ActivityModel,
+    GameModel,
+    GameExtendedModel
+]);
 
 function validateListener(methodName, sailsInstance, callback){
     if (typeof callback !== 'function'){

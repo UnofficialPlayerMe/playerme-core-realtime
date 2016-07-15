@@ -24,13 +24,13 @@ var make = function(filename, target, externals, alias){
 
 var makeWeb = function(filename){
     var externals = {
-        // "player-core-models": "PlayerMe.models",
+        "player-core-models": "PlayerMe.models"
     };
     return make(filename, 'web', externals, {});
 };
 var makeNode = function(filename){
     var alias = {
-        // 'player-core-models': path.join(projectRoot, 'node_modules/playerme-core-models/src/entry')
+        'player-core-models': path.join(projectRoot, 'node_modules/playerme-core-models/src/entry')
     };
     return make(filename, 'node', {}, alias);
 };

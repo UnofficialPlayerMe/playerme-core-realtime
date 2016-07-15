@@ -27,6 +27,7 @@
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
+    "playerme-core-models": "git+https://github.com/UnofficialPlayerMe/playerme-core-models.git",
     "sails.io.js": "^0.13.8",
     "socket.io-client": "^1.4.8"
   }
