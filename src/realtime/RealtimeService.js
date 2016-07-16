@@ -8,6 +8,7 @@ import FeedRealtime from './api/feed/FeedRealtime';
 class RealtimeService extends Sails {
     constructor() {
         super();
+        this._verifiedUserId = 0;
 
         this.feed = new FeedRealtime(this);
 
@@ -16,12 +17,26 @@ class RealtimeService extends Sails {
         };
     }
 
+    // <editor-fold desc="Verification">
+
     /**
-     * @param {function} callback
+     * This will link the Socket ID to the User ID,
+     * so that the Sails can send user-wide messages to the correct sockets.
+     * Send this immediately after connect.
+     * @see http://docs.playerme.apiary.io/#reference/realtime/oauth/authenticate-+++
+     * @param {function} [callback]
      * @returns {RealtimeService} Itself
      */
     verify(callback){
-        this.post('/verify', null, callback);
+        // Use super's post method to avoid verification check
+        super.post('/verify', null, (body, jwr)=>{
+            if(body.id) {
+                this._verifiedUserId = body.id;
+            }
+            if (callback){
+                callback(body, jwr);
+            }
+        });
         return this;
     }
 
@@ -35,6 +50,39 @@ class RealtimeService extends Sails {
         this.post('/verify', params, callback);
         return this;
     }
+
+    /**
+     * Whether the user has been verified
+     * @returns {boolean}
+     */
+    get isVerified(){
+        return this._verifiedUserId > 0;
+    }
+
+    /**
+     * The ID of the verified user, or 0
+     * @returns {int}
+     */
+    get verifiedUserId(){
+        return this._verifiedUserId;
+    }
+
+    /**
+     * Throw an error if the user isn't verified before calling the passed method name.
+     * @param {string} methodName
+     * @protected
+     */
+    _checkVerified(methodName){
+        if (!this.isVerified){
+            throw new Error(
+                "The user must be verified before calling "+
+                    this.constructor.name+"."+methodName+"."
+            );
+        }
+    }
+
+    // </editor-fold> Verification
+    // <editor-fold desc="Debugging">
 
     /**
      * Send a message which will be picked up by onTest()
@@ -56,6 +104,34 @@ class RealtimeService extends Sails {
         });
         return this;
     }
+    // </editor-fold> Debugging
+    // <editor-fold desc="Request Methods">
+
+    /** @inheritdoc */
+    get(url, data, callback){
+        this._checkVerified('get()');
+        super.get(url, data, callback);
+    }
+
+    /** @inheritdoc */
+    post(url, data, callback){
+        this._checkVerified('post()');
+        super.post(url, data, callback);
+    }
+
+    /** @inheritdoc */
+    put(url, data, callback){
+        this._checkVerified('put()');
+        super.put(url, data, callback);
+    }
+
+    /** @inheritdoc */
+    del(url, data, callback){
+        this._checkVerified('del()');
+        super.del(url, data, callback);
+    }
+
+    // </editor-fold> Request Methods
 
     //TODO app.deployed
     //TODO friend:online
