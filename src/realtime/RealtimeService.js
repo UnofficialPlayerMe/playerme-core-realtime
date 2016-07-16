@@ -6,15 +6,22 @@ import FeedRealtime from './api/feed/FeedRealtime';
  * @class The core Sails.io.js wrapper for PlayerMe
  */
 class RealtimeService extends Sails {
-    constructor() {
-        super();
-        this._verifiedUserId = 0;
+    /**
+     * @param {string} url       Server to connect to
+     * @param {object} [options] Custom options to override the defaults
+     */
+    constructor(url, options) {
+        super(url, options);
 
-        this.feed = new FeedRealtime(this);
+        this._verifiedUserId = 0;
 
         this._defaultConnectionOptions = {
             transports: ['websocket']
         };
+
+        this._connect(url, options);
+
+        this.feed = new FeedRealtime(this);
     }
 
     // <editor-fold desc="Verification">
@@ -134,22 +141,14 @@ class RealtimeService extends Sails {
 
     // </editor-fold> Request Methods
 
-    //TODO app.deployed
-    //TODO friend:online {user, online}
-
-    //TODO messaging:clear_unread_flag
-    //TODO messaging:group_update
-    //TODO messaging:mark_all_read
-    //TODO messaging:mark_read
-    //TODO messaging:new
-
-    //TODO notifications:clear_unread_flag > {notifications}
-    //TODO notifications:mark_read
-    //TODO notifications:mark_all_read
-    //TODO notifications:new
-
-    //TODO sails:parseError
-    //TODO streaming.refreshed
+    //TODO Likes: ["like_comment", "like_activity"],
+    //TODO Comments: ["reply_comment", "reply_activity", "also_commented"],
+    //TODO Mentions: ["mention_comment", "mention_activity"],
+    //TODO Follows: ["follow"],
+    //TODO Groups: ["group_request_user", "group_confirm_user", "group_deny_user", "group_remove_user", "group_request_admin", "group_confirm_admin", "group_deny_admin", "group_remove_admin"], "Game Attribute": ["game_attribute_approved", "game_suggestion_approved", "cover_approved", "cover_denied", "image_approved", "video_approved", "video_denied"],
+    //TODO Companies: ["company_request_approved"],
+    //TODO Achievements: ["badge_upgrade", "badge_new"],
+    //TODO Partnership: ["partnership_approved"]
 }
 
 export default RealtimeService;

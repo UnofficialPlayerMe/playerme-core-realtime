@@ -71,11 +71,11 @@ class AbstractRealtimeAPI {
 
         //TODO Remove this log when it's production ready
         if (!this._responseMap[channel]){
-            console.error(
+            console.info(
                 "Channel '"+channel+"' not mapped for "+this.constructor.name+"."
             );
         } else if (!this._responseMap[channel][action]){
-            console.error(
+            console.info(
                 "Action '"+action+"' not mapped for "+this.constructor.name+" channel '"+channel+"'."
             );
         }

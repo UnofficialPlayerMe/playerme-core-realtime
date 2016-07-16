@@ -7,14 +7,14 @@
     <script type="text/javascript" src="dist/playerme.models.js"></script>
     <script type="text/javascript" src="dist/playerme.realtime.js"></script>
 
+    <!--
+        Setup
+    -->
     <script type="text/javascript">
-        var service = new PlayerMe.realtime.RealtimeService();
-        window.PlayerMeDemo = {service:service};
 
-        console.log("PlayerMe Realtime Demo", {
-            PlayerMe: PlayerMe,
-            PlayerMeDemo: PlayerMeDemo
-        });
+        console.log(">> connect");
+        var service = new PlayerMe.realtime.RealtimeService('https://player.me:443');
+        service.onConnect(function(){ console.log("<< connect"); });
 
         var onReady = function(){
             console.log(">> subscribeToFeed");
@@ -25,9 +25,10 @@
             service.postTest(testText);
         };
 
-        console.log(">> connect");
-        service.connect('https://player.me:443');
-        service.onConnect(function(){ console.log("<< connect"); });
+        console.log("PlayerMe Realtime Demo", {
+            PlayerMe: PlayerMe,
+            service: service
+        });
 
         console.log(">> verify");
         service.verify(function(){
@@ -35,20 +36,84 @@
             onReady();
         });
 
+    </script>
+
+    <!--
+        Event listeners
+    -->
+    <script type="text/javascript">
+        service.on('app.deployed', function(){
+            console.info('app.deployed', arguments);
+        });
+        service.on('friend:online', function(){
+            console.info('friend:online', arguments);
+        });
+
+        service.on('messaging:clear_unread_flag', function(){
+            console.info('messaging:clear_unread_flag', arguments);
+        });
+        service.on('messaging:group_update', function(){
+            console.info('messaging:group_update', arguments);
+        });
+        service.on('messaging:mark_all_read', function(){
+            console.info('messaging:mark_all_read', arguments);
+        });
+        service.on('messaging:mark_read', function(){
+            console.info('messaging:mark_read', arguments);
+        });
+        service.on('messaging:new', function(){
+            console.info('messaging:new', arguments);
+        });
+
+        service.on('notifications:clear_unread_flag', function(){
+            // No data
+            console.info('notifications:clear_unread_flag', arguments);
+        });
+        service.on('notifications:mark_read', function(data){
+            // Example `data.set`: "like_comment:c5391614"
+            // Example `data.set`: "mention_comment:c5391614"
+            // Example `data.set`: "reply_comment:c5391614"
+            console.info('notifications:mark_read', {'set':data.set});
+        });
+        service.on('notifications:mark_all_read', function(){
+            // No data
+            console.info('notifications:mark_all_read', arguments);
+        });
+        service.on('notifications:new', function(){
+            console.info('notifications:new', arguments);
+        });
+
+        service.on('sails:parseError', function(){
+            console.info('sails:parseError', arguments);
+        });
+        service.on('streaming:refreshed', function(){
+            console.info('streaming:refreshed', arguments);
+        });
+
+
         service.onTest(function(message){
             console.log('<< onTest', message);
         });
-
-        service.feed.onFeedUpdate(function(response, activity){
-            console.log('<< onFeedUpdate', arguments);
-            console.log('>> subscribeToActivity', activity.id);
+        service.feed.onActivityAdded(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
+            console.log(">> subscribeToActivity", activity.id);
             service.feed.subscribeToActivity(activity.id);
         });
-
-        service.feed.onActivityUpdate(function(response, activity, comment){
-            console.log('<< onActivityUpdate', arguments);
+        service.feed.onActivityEdited(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
         });
-
+        service.feed.onActivityDeleted(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
+        });
+        service.feed.onCommentAdded(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
+        });
+        service.feed.onCommentEdited(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
+        });
+        service.feed.onCommentDeleted(function(response, activity){
+            console.log("<< onActivityAdded", arguments);
+        });
     </script>
 </head>
 <body>

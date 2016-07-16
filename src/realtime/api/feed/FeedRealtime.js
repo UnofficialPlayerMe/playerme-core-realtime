@@ -11,22 +11,83 @@ class FeedRealtime extends AbstractRealtimeAPI {
     constructor(realtimeService) {
         super(realtimeService);
 
-        /**
-         * TODO Remove temp function to indicate that a channel-action has been mapped
-         * @param {RealtimeResponse} response
-         */
-        var tempRoutedResponse = function(response){
-            console.info("Routed", response.channel, response.action, arguments);
-        };
-        this._mapResponse("feed-new", "activity.add",    tempRoutedResponse);
-        this._mapResponse("feed",     "activity.edit",   tempRoutedResponse);
-        this._mapResponse("feed",     "activity.delete", tempRoutedResponse);
-        this._mapResponse("feed",     "comment.add",     tempRoutedResponse);
-        this._mapResponse("feed",     "comment.edit",    tempRoutedResponse);
-        this._mapResponse("feed",     "comment.delete",  tempRoutedResponse);
+        // Add listeners
+        this.service.on('feed-new', (data)=>{
+            var args = [
+                new RealtimeResponse(data),
+                new ActivityModel(data.activity)
+            ];
+            this._routeResponse.apply(this, args);
+        });
+        this.service.on('feed', (data)=>{
+            var args = [
+                new RealtimeResponse(data),
+                new ActivityModel(data.activity)
+            ];
+            if (data.comment) {
+                args.push(new CommentModel(data.comment));
+            }
+            this._routeResponse.apply(this, args);
+        });
     }
 
-    // <editor-fold desc="Feed">
+    // <editor-fold desc="Events">
+
+    /**
+     * Listen out for activities added to the feed
+     * Can be triggered once you subscribeToFeed().
+     * @param {function} callback
+     */
+    onActivityAdded(callback){
+        this._mapResponse("feed-new", "activity.add", callback);
+    }
+
+    /**
+     * Listen out for an activity being edited.
+     * Can be triggered once you subscribeToActivity().
+     * @param {function} callback
+     */
+    onActivityEdited(callback){
+        this._mapResponse("feed", "activity.edit", callback);
+    }
+    /**
+     * Listen out for an activity being deleted.
+     * Can be triggered once you subscribeToActivity().
+     * @param {function} callback
+     */
+    onActivityDeleted(callback){
+        this._mapResponse("feed", "activity.delete", callback);
+    }
+
+    /**
+     * Listen out for a comment being edited to an activity.
+     * Can be triggered once you subscribeToActivity().
+     * @param {function} callback
+     */
+    onCommentAdded(callback){
+        this._mapResponse("feed", "comment.add", callback);
+    }
+
+    /**
+     * Listen out for an activity's comment being edited.
+     * Can be triggered once you subscribeToActivity().
+     * @param {function} callback
+     */
+    onCommentEdited(callback){
+        this._mapResponse("feed", "comment.edit", callback);
+    }
+
+    /**
+     * Listen out for an activity's comment being deleted.
+     * Can be triggered once you subscribeToActivity().
+     * @param {function} callback
+     */
+    onCommentDeleted(callback){
+        this._mapResponse("feed", "comment.delete", callback);
+    }
+
+    // </editor-fold> Events
+    // <editor-fold desc="Subscribe">
 
     /**
      * Subscribe to tabs in the feed.
@@ -37,22 +98,6 @@ class FeedRealtime extends AbstractRealtimeAPI {
         var params = { channel:'feed-new', key:tabs };
         this.service.post('/rooms', params);
     }
-
-    /**
-     * When a new activity is added to the subscribed channels.
-     * @param {function} callback
-     */
-    onFeedUpdate(callback){
-        this.service.on('feed-new', (data)=>{
-            var response = new RealtimeResponse(data);
-            var activity = new ActivityModel(data.activity);
-            this._routeResponse(response, activity);
-            callback(response, activity);
-        });
-    }
-
-    // </editor-fold> Feed
-    // <editor-fold desc="Activity">
 
     /**
      * Subscribe to a specific activity
@@ -115,25 +160,7 @@ class FeedRealtime extends AbstractRealtimeAPI {
         this.service.post('/rooms', params);
     }
 
-    /**
-     * When a subscribed activity is updated.
-     * @param {function} callback
-     */
-    onActivityUpdate(callback){
-        this.service.on('feed', (data)=>{
-            var response = new RealtimeResponse(data);
-            var activity = new ActivityModel(data.activity);
-            var comment = null;
-            if (data.comment) {
-                comment = new CommentModel(data.comment);
-            }
-
-            this._routeResponse(response, activity, comment);
-            callback(response, activity, comment);
-        });
-    }
-
-    // </editor-fold> Activity
+    // </editor-fold> Subscribe
 }
 
 export default FeedRealtime;

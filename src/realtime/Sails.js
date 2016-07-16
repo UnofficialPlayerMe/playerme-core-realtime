@@ -25,27 +25,46 @@ class Sails {
          * @protected
          */
         this._defaultConnectionOptions = {};
+
+        /**
+         * The URL used to connect
+         * @type {string}
+         * @private
+         */
+        this._url = null;
+
+        /**
+         * The options used to connect
+         * @type {object}
+         * @private
+         */
+        this._options = null;
     }
 
     // <editor-fold desc="Connection">
 
     /**
-     * Connect Sails to the specified server
-     * @param {string} url              Server to connect to
-     * @param {object} [options]        Custom options to override the defaults
-     * @return {Sails} Itself
+     * Connect to the specified Sails.io server
+     * @param {string} url       Server to connect to
+     * @param {object} [options] Custom options to override the defaults
+     * @protected
      */
-    connect(url, options){
+    _connect(url, options){
         // Validate
+        var functionName = this.constructor.name+"._connect()";
         if (typeof url !== 'string'){
-            throw new TypeError("URL passed to Sails.connect() is not a string. ["+typeof url+"]");
+            throw new TypeError("URL passed to "+functionName+" is not a string. ["+typeof url+"]");
         }
         if (url.length === 0){
-            throw new Error("No URL passed to Sails.connect()");
+            throw new Error("No URL passed to "+functionName+".");
         }
         if (options && typeof options !== 'object'){
-            throw new TypeError("Options passed to Sails.connect() is not an object. ["+typeof options+"]");
+            throw new TypeError("Options passed to "+functionName+" is not an object. ["+typeof options+"]");
         }
+
+        // Store values
+        this._url = url;
+        this._options = options;
 
         // Set options
         var opts = this._defaultConnectionOptions || {};
@@ -60,6 +79,14 @@ class Sails {
         // Execute
         this._socket = this._sails.connect(url, opts);
         return this;
+    }
+
+    /**
+     * Reconnect with the arguments last passed to _connect().
+     * @protected
+     */
+    _reconnect(){
+        this._connect(this._url, this._options);
     }
 
     /**
@@ -80,7 +107,7 @@ class Sails {
      * @param {function} callback
      * @return {Sails} Itself
      */
-    onConnect(callback){
+    onConnect(callback) {
         return this.on('connect', callback);
     }
 
@@ -356,7 +383,7 @@ class Sails {
         }
         if (!this._socket){
             throw new Error(
-                "Socket not created before calling "+functionName+". Was connect() called?"
+                "Socket not created before calling "+functionName+". Was _connect() called?"
             );
         }
     }
@@ -406,7 +433,7 @@ class Sails {
         // Check socket exists
         if (!this._socket){
             throw new Error(
-                "Socket not created before calling "+functionName+". Was connect() called?"
+                "Socket not created before calling "+functionName+". Was _connect() called?"
             );
         }
     }
