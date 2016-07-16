@@ -51,7 +51,9 @@ class RealtimeService extends Sails {
      * @return {Sails} Itself
      */
     onTest(callback){
-        this.on('test', callback);
+        this.on('test', (data)=>{
+            callback(data.message);
+        });
         return this;
     }
 

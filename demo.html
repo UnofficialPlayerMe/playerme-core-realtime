@@ -8,22 +8,12 @@
     <script type="text/javascript" src="dist/playerme.realtime.js"></script>
 
     <script type="text/javascript">
-        var RealtimeService = PlayerMe.realtime.RealtimeService;
-        var ActivityModel = PlayerMe.models.ActivityModel;
-        var CommentModel = PlayerMe.models.CommentModel;
-
-        var service = new RealtimeService();
+        var service = new PlayerMe.realtime.RealtimeService();
         window.PlayerMeDemo = {service:service};
-
-        /**
-         * @type {Object.<int, ActivityModel>}
-         */
-        var activities = {};
 
         console.log("PlayerMe Realtime Demo", {
             PlayerMe: PlayerMe,
-            PlayerMeDemo: PlayerMeDemo,
-            service: service
+            PlayerMeDemo: PlayerMeDemo
         });
 
         var onReady = function(){
@@ -45,45 +35,18 @@
             onReady();
         });
 
-        service.onTest(function(payload){
-            console.log('<< onTest', payload);
+        service.onTest(function(message){
+            console.log('<< onTest', message);
         });
 
-        service.feed.onFeedUpdate(function(payload){
-            console.log('<< onFeedUpdate', payload);
-
-            try {
-                var activity = new ActivityModel(payload.activity);
-                activities[activity.id] = activity;
-                console.log('   ', activity);
-            }catch(e){
-                console.error('   ', 'activity', e);
-            }
-
-            console.log('>> subscribeToActivity', payload.activity.id);
-            service.feed.subscribeToActivity(payload.activity.id);
+        service.feed.onFeedUpdate(function(response, activity){
+            console.log('<< onFeedUpdate', arguments);
+            console.log('>> subscribeToActivity', activity.id);
+            service.feed.subscribeToActivity(activity.id);
         });
 
-        service.feed.onActivityUpdate(function(payload){
-            console.log('<< onActivityUpdate', payload);
-
-            try {
-                var activity = new ActivityModel(payload.activity);
-                activities[activity.id] = activity;
-                console.log('   ', activity);
-            }catch(e){
-                console.error('   ', 'activity', e);
-            }
-
-            try {
-                var comment = null;
-                if (payload.comment) {
-                    comment = new CommentModel(payload.comment);
-                    console.log('   ', comment);
-                }
-            }catch(e){
-                console.error('   ', 'comment', e);
-            }
+        service.feed.onActivityUpdate(function(response, activity, comment){
+            console.log('<< onActivityUpdate', arguments);
         });
 
     </script>
