@@ -1,33 +1,4 @@
 import Sails from './Sails';
-import {
-    UserModel,
-    UserExtendedModel,
-    CommentModel,
-    ActivityModel,
-    GameModel,
-    GameExtendedModel
-} from 'player-core-models';
-
-console.log("Realtime Models", [
-    UserModel,
-    UserExtendedModel,
-    CommentModel,
-    ActivityModel,
-    GameModel,
-    GameExtendedModel
-]);
-
-function validateListener(methodName, sailsInstance, callback){
-    if (typeof callback !== 'function'){
-        throw new TypeError("Callback passed to "+methodName+" is not a function. ["+typeof callback+"]");
-    }
-    if (!callback){
-        throw new ReferenceError("No callback passed to "+methodName+".");
-    }
-    if (!sailsInstance._socket){
-        throw new Error("Socket not created before calling "+methodName+". Was connect() called?");
-    }
-}
 
 /**
  * @class Description of RealtimeService
@@ -46,13 +17,7 @@ class RealtimeService extends Sails {
      * @returns {RealtimeService} Itself
      */
     verify(callback){
-        this._socket.post('/verify', null, callback);
-        return this;
-    }
-
-    sendTest(message){
-        var params = { message: message };
-        this._socket.post('/test', params);
+        this.post('/verify', null, callback);
         return this;
     }
 
@@ -63,7 +28,17 @@ class RealtimeService extends Sails {
      */
     verifyWithOAuth(accessToken, callback){
         var params = { access_token: accessToken };
-        this._socket.post('/verify', params, callback);
+        this.post('/verify', params, callback);
+        return this;
+    }
+
+    /**
+     * Send a message which will be picked up by onTest()
+     * @param {string} message The message to make the round-trip.
+     * @returns {RealtimeService}
+     */
+    postTest(message){
+        this.post('/test', {message: message});
         return this;
     }
 
@@ -75,7 +50,7 @@ class RealtimeService extends Sails {
     subscribeToActivity(activityId, callback){
         if (!activityId) activityId = [];
         var params = { channel:'feed', key:activityId };
-        this._socket.post('/rooms', params, callback);
+        this.post('/rooms', params, callback);
     }
 
     /**
@@ -86,7 +61,7 @@ class RealtimeService extends Sails {
     subscribeToActivities(activityIds, callback){
         if (!activityIds) activityIds = [];
         var params = { channel:'feed', key:activityIds };
-        this._socket.post('/rooms', params, callback);
+        this.post('/rooms', params, callback);
     }
 
     /**
@@ -97,7 +72,7 @@ class RealtimeService extends Sails {
     subscribeToFeed(tabs, callback){
         if (!tabs) tabs = ['following', 'discover'];
         var params = { channel:'feed-new', key:tabs };
-        this._socket.post('/rooms', params, callback);
+        this.post('/rooms', params, callback);
     }
 
     /**
@@ -105,8 +80,7 @@ class RealtimeService extends Sails {
      * @return {Sails} Itself
      */
     onTest(callback){
-        Sails.validateListener('onTest', this, callback);
-        this._socket.on('test', callback);
+        this.on('test', callback);
         return this;
     }
 
@@ -116,8 +90,7 @@ class RealtimeService extends Sails {
      * @return {Sails} Itself
      */
     onActivityUpdate(callback){
-        Sails.validateListener('onFeed', this, callback);
-        this._socket.on('feed', callback);
+        this.on('feed', callback);
         return this;
     }
 
@@ -127,8 +100,7 @@ class RealtimeService extends Sails {
      * @return {Sails} Itself
      */
     onFeedUpdate(callback){
-        Sails.validateListener('onFeedNew', this, callback);
-        this._socket.on('feed-new', callback);
+        this.on('feed-new', callback);
         return this;
     }
 

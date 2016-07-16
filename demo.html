@@ -2,39 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PlayerME Realtime Demo</title>
+    <title>PlayerMe Realtime Demo</title>
 
     <script type="text/javascript" src="dist/playerme.models.js"></script>
     <script type="text/javascript" src="dist/playerme.realtime.js"></script>
 
     <script type="text/javascript">
-        console.log("PlayerMe", PlayerMe);
         var RealtimeService = PlayerMe.realtime.RealtimeService;
         var ActivityModel = PlayerMe.models.ActivityModel;
         var CommentModel = PlayerMe.models.CommentModel;
 
         var service = new RealtimeService();
-        service.connect('https://player.me:443');
+        window.PlayerMeDemo = {service:service};
 
         /**
          * @type {Object.<int, ActivityModel>}
          */
         var activities = {};
 
-        console.log(">> verify");
-        service.verify(function(body, JWR){
-            console.log("<< verify", {
-                body: body,
-                JWR: JWR,
-                arguments: arguments
-            });
+        console.log("PlayerMe Realtime Demo", {
+            PlayerMe: PlayerMe,
+            PlayerMeDemo: PlayerMeDemo,
+            service: service
+        });
 
+        var onReady = function(){
             console.log(">> subscribeToFeed");
             service.subscribeToFeed();
 
             var testText = "woo";
-            console.log(">> sendTest", testText);
-            service.sendTest(testText);
+            console.log(">> postTest", testText);
+            service.postTest(testText);
+        };
+
+        console.log(">> connect");
+        service.connect('https://player.me:443');
+        service.onConnect(function(){ console.log("<< connect"); });
+
+        console.log(">> verify");
+        service.verify(function(){
+            console.log("<< verify", arguments);
+            onReady();
         });
 
         service.onTest(function(payload){
@@ -47,9 +55,9 @@
             try {
                 var activity = new ActivityModel(payload.activity);
                 activities[activity.id] = activity;
-                console.log('   activity', activity);
+                console.log('   ', activity);
             }catch(e){
-                console.error('   activity', e);
+                console.error('   ', 'activity', e);
             }
 
             console.log('>> subscribeToActivity', payload.activity.id);
@@ -62,19 +70,19 @@
             try {
                 var activity = new ActivityModel(payload.activity);
                 activities[activity.id] = activity;
-                console.log('   activity', activity);
+                console.log('   ', activity);
             }catch(e){
-                console.error('   activity', e);
+                console.error('   ', 'activity', e);
             }
 
             try {
                 var comment = null;
                 if (payload.comment) {
                     comment = new CommentModel(payload.comment);
-                    console.log('   comment', comment);
+                    console.log('   ', comment);
                 }
             }catch(e){
-                console.error('   comment', e);
+                console.error('   ', 'comment', e);
             }
         });
 
