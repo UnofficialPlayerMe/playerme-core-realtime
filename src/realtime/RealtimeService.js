@@ -1,6 +1,7 @@
 import Sails from './Sails';
 
 import FeedRealtime from './api/feed/FeedRealtime';
+import NotificationsRealtime from './api/notifications/NotificationsRealtime';
 
 /**
  * @class The core Sails.io.js wrapper for PlayerMe
@@ -22,6 +23,7 @@ class RealtimeService extends Sails {
         this._connect(url, options);
 
         this.feed = new FeedRealtime(this);
+        this.notifications = new NotificationsRealtime(this);
     }
 
     // <editor-fold desc="Verification">
@@ -140,15 +142,6 @@ class RealtimeService extends Sails {
     }
 
     // </editor-fold> Request Methods
-
-    //TODO Likes: ["like_comment", "like_activity"],
-    //TODO Comments: ["reply_comment", "reply_activity", "also_commented"],
-    //TODO Mentions: ["mention_comment", "mention_activity"],
-    //TODO Follows: ["follow"],
-    //TODO Groups: ["group_request_user", "group_confirm_user", "group_deny_user", "group_remove_user", "group_request_admin", "group_confirm_admin", "group_deny_admin", "group_remove_admin"], "Game Attribute": ["game_attribute_approved", "game_suggestion_approved", "cover_approved", "cover_denied", "image_approved", "video_approved", "video_denied"],
-    //TODO Companies: ["company_request_approved"],
-    //TODO Achievements: ["badge_upgrade", "badge_new"],
-    //TODO Partnership: ["partnership_approved"]
 }
 
 export default RealtimeService;
