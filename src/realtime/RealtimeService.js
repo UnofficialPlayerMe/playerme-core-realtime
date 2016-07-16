@@ -1,11 +1,15 @@
 import Sails from './Sails';
 
+import FeedRealtime from './api/feed/FeedRealtime';
+
 /**
- * @class Description of RealtimeService
+ * @class The core Sails.io.js wrapper for PlayerMe
  */
 class RealtimeService extends Sails {
     constructor() {
         super();
+
+        this.feed = new FeedRealtime(this);
 
         this._defaultConnectionOptions = {
             transports: ['websocket']
@@ -43,64 +47,11 @@ class RealtimeService extends Sails {
     }
 
     /**
-     * Subscribe to a specific activity
-     * @param {int} activityId
-     * @param {function} callback
-     */
-    subscribeToActivity(activityId, callback){
-        if (!activityId) activityId = [];
-        var params = { channel:'feed', key:activityId };
-        this.post('/rooms', params, callback);
-    }
-
-    /**
-     * Subscribe to specific activities
-     * @param {int[]} activityIds
-     * @param {function} callback
-     */
-    subscribeToActivities(activityIds, callback){
-        if (!activityIds) activityIds = [];
-        var params = { channel:'feed', key:activityIds };
-        this.post('/rooms', params, callback);
-    }
-
-    /**
-     * Subscribe to tabs in the feed.
-     * @param tabs
-     * @param callback
-     */
-    subscribeToFeed(tabs, callback){
-        if (!tabs) tabs = ['following', 'discover'];
-        var params = { channel:'feed-new', key:tabs };
-        this.post('/rooms', params, callback);
-    }
-
-    /**
      * @param {function} callback
      * @return {Sails} Itself
      */
     onTest(callback){
         this.on('test', callback);
-        return this;
-    }
-
-    /**
-     * When a subscribed activity is updated.
-     * @param {function} callback
-     * @return {Sails} Itself
-     */
-    onActivityUpdate(callback){
-        this.on('feed', callback);
-        return this;
-    }
-
-    /**
-     * When a new activity is added to the subscribed channels.
-     * @param {function} callback
-     * @return {Sails} Itself
-     */
-    onFeedUpdate(callback){
-        this.on('feed-new', callback);
         return this;
     }
 

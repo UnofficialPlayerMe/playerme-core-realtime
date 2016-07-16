@@ -2,7 +2,7 @@ const SailsIOClient = require('sails.io.js');
 const SocketIo = require('socket.io-client');
 
 /**
- * @class Description of RealtimeService
+ * @class The base wrapper class for sails.io.js
  */
 class Sails {
     constructor() {
@@ -26,6 +26,8 @@ class Sails {
          */
         this._defaultConnectionOptions = {};
     }
+
+    // <editor-fold desc="Connection">
 
     /**
      * Connect Sails to the specified server
@@ -70,6 +72,9 @@ class Sails {
         }
         return this;
     }
+
+    // </editor-fold> Connection
+    // <editor-fold desc="Listeners">
 
     /**
      * @param {function} callback
@@ -135,7 +140,8 @@ class Sails {
         return this.on('reconnect_failed', callback);
     }
 
-    // <editor-fold desc="Listeners">
+    // </editor-fold> Listeners
+    // <editor-fold desc="Listener Methods">
 
     /**
      * Start listening for server-sent events from Sails with the specified eventIdentity.
@@ -178,8 +184,8 @@ class Sails {
         return this;
     }
 
-    // </editor-fold> Listeners
-    // <editor-fold desc="Requests">
+    // </editor-fold> Listener Methods
+    // <editor-fold desc="Request Methods">
 
     /**
      * Send a virtual request to a Sails server using Socket.io.
@@ -312,7 +318,7 @@ class Sails {
         return this._socket['delete'](url, data, callback);
     }
 
-    // </editor-fold> Requests
+    // </editor-fold> Request Methods
     // <editor-fold desc="Validation">
 
     /**

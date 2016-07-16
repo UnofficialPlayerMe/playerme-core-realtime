@@ -28,7 +28,7 @@
 
         var onReady = function(){
             console.log(">> subscribeToFeed");
-            service.subscribeToFeed();
+            service.feed.subscribeToFeed();
 
             var testText = "woo";
             console.log(">> postTest", testText);
@@ -49,7 +49,7 @@
             console.log('<< onTest', payload);
         });
 
-        service.onFeedUpdate(function(payload){
+        service.feed.onFeedUpdate(function(payload){
             console.log('<< onFeedUpdate', payload);
 
             try {
@@ -61,10 +61,10 @@
             }
 
             console.log('>> subscribeToActivity', payload.activity.id);
-            service.subscribeToActivity(payload.activity.id);
+            service.feed.subscribeToActivity(payload.activity.id);
         });
 
-        service.onActivityUpdate(function(payload){
+        service.feed.onActivityUpdate(function(payload){
             console.log('<< onActivityUpdate', payload);
 
             try {
