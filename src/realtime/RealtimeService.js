@@ -104,6 +104,7 @@ class RealtimeService extends Sails {
         });
         return this;
     }
+
     // </editor-fold> Debugging
     // <editor-fold desc="Request Methods">
 
@@ -134,7 +135,7 @@ class RealtimeService extends Sails {
     // </editor-fold> Request Methods
 
     //TODO app.deployed
-    //TODO friend:online
+    //TODO friend:online {user, online}
 
     //TODO messaging:clear_unread_flag
     //TODO messaging:group_update
@@ -142,7 +143,7 @@ class RealtimeService extends Sails {
     //TODO messaging:mark_read
     //TODO messaging:new
 
-    //TODO notifications:clear_unread_flag
+    //TODO notifications:clear_unread_flag > {notifications}
     //TODO notifications:mark_read
     //TODO notifications:mark_all_read
     //TODO notifications:new

@@ -18,7 +18,7 @@
 
         var onReady = function(){
             console.log(">> subscribeToFeed");
-            service.feed.subscribeToFeed();
+            service.feed.subscribeToFeed(['discover']);
 
             var testText = "woo";
             console.log(">> postTest", testText);
