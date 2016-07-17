@@ -1,53 +1,5 @@
 import AbstractRealtimeAPI from '../AbstractRealtimeAPI';
-
-// <editor-fold desc="Notification Types">
-
-// Likes
-const LIKE_COMMENT = 'like_comment';
-const LIKE_ACTIVITY = 'like_activity';
-
-// Comments
-const REPLY_COMMENT = 'reply_comment';
-const REPLY_ACTIVITY = 'reply_activity';
-const ALSO_COMMENTED = 'also_commented';
-
-// Mentions
-const MENTION_COMMENT = 'mention_comment';
-const MENTION_ACTIVITY = 'mention_activity';
-
-// Follows
-const FOLLOW = 'follow';
-
-// Groups
-const GROUP_REQUEST_USER = 'group_request_user';
-const GROUP_CONFIRM_USER = 'group_confirm_user';
-const GROUP_DENY_USER = 'group_deny_user';
-const GROUP_REMOVE_USER = 'group_remove_user';
-const GROUP_REQUEST_ADMIN = 'group_request_admin';
-const GROUP_CONFIRM_ADMIN = 'group_confirm_admin';
-const GROUP_DENY_ADMIN = 'group_deny_admin';
-const GROUP_REMOVE_ADMIN = 'group_remove_admin';
-
-// Game Attribute
-const GAME_ATTRIBUTE_APPROVED = 'game_attribute_approved';
-const GAME_SUGGESTION_APPROVED = 'game_suggestion_approved';
-const COVER_APPROVED = 'cover_approved';
-const COVER_DENIED = 'cover_denied';
-const IMAGES_APPROVED = 'image_approved';
-const VIDEO_APPROVED = 'video_approved';
-const VIDEO_DENIED = 'video_denied';
-
-// Companies
-const COMPANY_REQUEST_APPROVED = 'company_request_approved';
-
-// Achievements
-const BADGE_UPGRADE = 'badge_upgrade';
-const BADGE_NEW = 'badge_new';
-
-// Partnership
-const PARTNERSHIP_APPROVED = 'partnership_approved';
-
-// </editor-fold> Notification Types
+import {NotificationModel} from 'player-core-models';
 
 /**
  * @class Description of FeedRealtime
@@ -93,30 +45,35 @@ class NotificationsRealtime extends AbstractRealtimeAPI {
     }
 
     /**
-     * TODO
-     * @param {function} callback
+     * Called when marking all notifications as read
+     * @param {function} callback Takes nothing
      */
     onMarkReadAll(callback){
         this.service.on('notifications:mark_all_read', function(){
             console.info('notifications:mark_all_read', arguments);
-            callback(); // TODO Seems to be nothing to pass
+            callback();
         });
     }
 
     /**
-     * TODO
-     * @param {function} callback
+     * Callback is applied when a new notification is created
+     * @param {function} callback Takes an array of NotificationModels in the shortlist
      */
     onNew(callback){
         this.service.on('notifications:new', function(data){
             /**
              * All notifications in list, both read and unread
              * TODO Convert to Notification Models
-             * @type {Object[]}
+             * @type {NotificationModel[]}
              */
-            var notifications = data.notifications;
+            try {
+                var notifications = data.notifications.map((obj)=> {
+                    return new NotificationModel(obj);
+                });
+            }catch(e){
+                console.error("NotificationsRealtime.onNew Error:", e);
+            }
 
-            console.info('notifications:new', arguments);
             callback(notifications);
         });
     }

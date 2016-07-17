@@ -17,8 +17,8 @@
         service.onConnect(function(){ console.log("<< connect"); });
 
         var onReady = function(){
-            console.log(">> subscribeToFeed");
-            service.feed.subscribeToFeed(['discover']);
+//            console.log(">> subscribeToFeed");
+//            service.feed.subscribeToFeed(['discover']);
 
             var testText = "woo";
             console.log(">> postTest", testText);
@@ -100,19 +100,19 @@
             service.feed.subscribeToActivity(activity.id);
         });
         service.feed.onActivityEdited(function(response, activity){
-            console.log("<< onActivityAdded", arguments);
+            console.log("<< onActivityEdited", arguments);
         });
         service.feed.onActivityDeleted(function(response, activity){
-            console.log("<< onActivityAdded", arguments);
+            console.log("<< onActivityDeleted", arguments);
         });
-        service.feed.onCommentAdded(function(response, activity){
-            console.log("<< onActivityAdded", arguments);
+        service.feed.onCommentAdded(function(response, activity, comment){
+            console.log("<< onCommentAdded", arguments);
         });
-        service.feed.onCommentEdited(function(response, activity){
-            console.log("<< onActivityAdded", arguments);
+        service.feed.onCommentEdited(function(response, activity, comment){
+            console.log("<< onCommentEdited", arguments);
         });
-        service.feed.onCommentDeleted(function(response, activity){
-            console.log("<< onActivityAdded", arguments);
+        service.feed.onCommentDeleted(function(response, activity, comment){
+            console.log("<< onCommentDeleted", arguments);
         });
 
     </script>
