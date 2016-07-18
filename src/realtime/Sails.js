@@ -291,7 +291,8 @@ class Sails {
      */
     get(url, data, callback){
         this._validateRequest(this.constructor.name+'.get()', url, data, callback);
-        return this._socket.get(url, data, callback);
+        this._socket.get(url, data, callback);
+        return this;
     }
 
     /**
@@ -308,7 +309,8 @@ class Sails {
      */
     post(url, data, callback){
         this._validateRequest(this.constructor.name+'.post()', url, data, callback);
-        return this._socket.post(url, data, callback);
+        this._socket.post(url, data, callback);
+        return this;
     }
 
     /**
@@ -325,7 +327,8 @@ class Sails {
      */
     put(url, data, callback){
         this._validateRequest(this.constructor.name+'.put()', url, data, callback);
-        return this._socket.put(url, data, callback);
+        this._socket.put(url, data, callback);
+        return this;
     }
 
     /**
@@ -342,7 +345,8 @@ class Sails {
      */
     del(url, data, callback){
         this._validateRequest(this.constructor.name+'.del()', url, data, callback);
-        return this._socket['delete'](url, data, callback);
+        this._socket['delete'](url, data, callback);
+        return this;
     }
 
     // </editor-fold> Request Methods
