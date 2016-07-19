@@ -39,7 +39,7 @@ class RealtimeService extends Sails {
     verify(callback){
         // Use super's post method to avoid verification check
         super.post('/verify', null, (body, jwr)=>{
-            if(body.id) {
+            if(body && body.id) {
                 this._verifiedUserId = body.id;
             }
             if (callback){

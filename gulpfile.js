@@ -34,6 +34,21 @@ gulp.task('build:web:vendor', function(){
     );
 });
 
+gulp.task('build:node', function() {
+    var makeNode = require('./gulp/webpack').makeNode;
+    return gulp.src(
+        'src/node-entry.js'
+    ).pipe(
+        webpackStream(
+            makeNode('node-playerme.realtime.js')
+        )
+    ).pipe(
+        minify()
+    ).pipe(
+        gulp.dest('dist/')
+    );
+});
+
 gulp.task('run:node', function() {
 
     var env = {
@@ -43,7 +58,7 @@ gulp.task('run:node', function() {
 
     var stream = nodemon({
         env: env
-        ,   script: './index.js'
+        ,   script: './dist/node-playerme.realtime.js'
         ,   watch: 'src'
         ,   ext: 'js'
 //      ,   ignore: ['ignored.js']
